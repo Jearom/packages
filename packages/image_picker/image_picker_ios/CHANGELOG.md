@@ -1,3 +1,19 @@
+## NEXT
+
+* Updates UI test photo element query for iOS 18.
+
+## 0.8.12
+
+* Re-adds Swift Package Manager compatibility.
+
+## 0.8.11+2
+
+* Temporarily remove Swift Package Manager compatibility to resolve issues with Cocoapods builds.
+
+## 0.8.11+1
+
+* Makes all headers public with Swift Package Manager integration to keep inline with CocoaPods.
+
 ## 0.8.11
 
 * Adds Swift Package Manager compatibility.

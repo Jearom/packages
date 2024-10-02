@@ -95,7 +95,8 @@ class PodspecCheckCommand extends PackageLoopingCommand {
       }
     }
 
-    if (pluginSupportsPlatform(platformIOS, package) &&
+    if ((pluginSupportsPlatform(platformIOS, package) ||
+            pluginSupportsPlatform(platformMacOS, package)) &&
         !podspecs.any(_hasPrivacyManifest)) {
       printError('No PrivacyInfo.xcprivacy file specified. Please ensure that '
           'a privacy manifest is included in the build using '
@@ -179,6 +180,12 @@ class PodspecCheckCommand extends PackageLoopingCommand {
           getRelativePosixPath(entity, from: package.directory);
       // Ignore example code.
       if (relativePath.startsWith('example/')) {
+        return false;
+      }
+      // Ignore test code.
+      if (relativePath.contains('/Tests/') ||
+          relativePath.contains('/RunnerTests/') ||
+          relativePath.contains('/RunnerUITests/')) {
         return false;
       }
       final String filePath = entity.path;

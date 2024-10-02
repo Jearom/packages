@@ -1,3 +1,8 @@
+## 0.9.4+1
+
+* Adds privacy manifest.
+* Updates minimum supported SDK version to Flutter 3.19/Dart 3.3.
+
 ## 0.9.4
 
 * Adds Swift Package Manager compatibility.

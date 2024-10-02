@@ -405,6 +405,31 @@ void main() {
           ));
     });
 
+    test('does not require the search paths workaround for Swift tests',
+        () async {
+      final RepositoryPackage plugin = createFakePlugin(
+        'plugin1',
+        packagesDir,
+        extraFiles: <String>[
+          'darwin/Tests/SharedTest.swift',
+          'example/ios/RunnerTests/UnitTest.swift',
+          'example/ios/RunnerUITests/UITest.swift',
+        ],
+      );
+      _writeFakePodspec(plugin, 'ios');
+
+      final List<String> output =
+          await runCapturingPrint(runner, <String>['podspec-check']);
+
+      expect(
+          output,
+          containsAllInOrder(
+            <Matcher>[
+              contains('Ran for 1 package(s)'),
+            ],
+          ));
+    });
+
     test(
         'does not require the search paths workaround for darwin Package.swift',
         () async {
@@ -570,6 +595,50 @@ void main() {
         },
       );
       _writeFakePodspec(plugin, 'ios', includePrivacyManifest: true);
+
+      final List<String> output =
+          await runCapturingPrint(runner, <String>['podspec-check']);
+
+      expect(
+          output,
+          containsAllInOrder(
+            <Matcher>[contains('Ran for 1 package(s)')],
+          ));
+    });
+
+    test('fails when a macOS plugin is missing a privacy manifest', () async {
+      final RepositoryPackage plugin = createFakePlugin(
+        'plugin1',
+        packagesDir,
+        platformSupport: <String, PlatformDetails>{
+          Platform.macOS: const PlatformDetails(PlatformSupport.inline),
+        },
+      );
+      _writeFakePodspec(plugin, 'macos');
+
+      Error? commandError;
+      final List<String> output = await runCapturingPrint(
+          runner, <String>['podspec-check'], errorHandler: (Error e) {
+        commandError = e;
+      });
+
+      expect(commandError, isA<ToolExit>());
+      expect(
+          output,
+          containsAllInOrder(
+            <Matcher>[contains('No PrivacyInfo.xcprivacy file specified.')],
+          ));
+    });
+
+    test('passes when a macOS plugin has a privacy manifest', () async {
+      final RepositoryPackage plugin = createFakePlugin(
+        'plugin1',
+        packagesDir,
+        platformSupport: <String, PlatformDetails>{
+          Platform.macOS: const PlatformDetails(PlatformSupport.inline),
+        },
+      );
+      _writeFakePodspec(plugin, 'macos', includePrivacyManifest: true);
 
       final List<String> output =
           await runCapturingPrint(runner, <String>['podspec-check']);
